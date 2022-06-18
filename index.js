@@ -5,7 +5,7 @@ const yts = require( 'yt-search' )
 const ver = require('./package.json').version;
 const token = require( "./token.json" );
 const commands = require( "./commands.json" );
-const commands2 = require("./commands2.json");
+//const commands2 = require("./math.json")
 
 ///関数
 function md5hex(str) {
@@ -21,7 +21,6 @@ function sha256hex(str) {
 ///コマンドの定義とスタートアップ
 client.once("ready", async () => {
     await client.application.commands.set(commands);
-    //await client.application.commands.set(commands2);
     setInterval(() => {
         client.user.setActivity({
             name: `Severs:${client.guilds.cache.size}|v${ver}`
@@ -74,10 +73,14 @@ client.on("interactionCreate", async (interaction) => {
         await interaction.reply(slot);
     }
     if (interaction.commandName === 'yts'){
-        let url = yts( interaction.options.getString("string"), function ( err, r ) {
-        const videos = r.videos
-        const playlists = r.playlists || r.lists
-        interaction.reply(videos[ 0 ].url)
+        let url = yts( interaction.options.getString("string"), async function ( err, r ) {
+	    let msg = "動画が見つかりませんでした";
+	    try{
+		msg = r.videos[0].url;
+	    }catch{
+            	;
+	    }
+	    await interaction.reply(msg);
         })
 
     }
@@ -86,6 +89,9 @@ client.on("interactionCreate", async (interaction) => {
     }
     if (interaction.commandName === 'sha256') {
         await interaction.reply(sha256hex(interaction.options.getString("string")));
+    }
+    if (interaction.commandName === 'sqrt'){
+        await interaction.reply(String(Math.sqrt(interaction.options.getNumber("n"))));
     }
     if (interaction.commandName === 'info') {
         await interaction.reply({embeds: [{
@@ -107,12 +113,10 @@ client.on("interactionCreate", async (interaction) => {
                     inline: true,
                 },{
                     name: "製作者",
-                    value: "tetra",
+                    value: "Netetra",
                     inline: true,
                 }
             ],
         }]});
     }
 });
-
-client.login(token["bot"]);
